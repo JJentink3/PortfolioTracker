@@ -4,8 +4,8 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-st.set_page_config(page_title="Mijn Portfolio Tracker", layout="wide")
-st.title("📈 Mijn Portfolio Tracker")
+st.set_page_config(page_title="MY Portfolio Tracker", layout="wide")
+st.title("📈 My Portfolio Tracker")
 
 # Upload CSV-bestand
 uploaded_file = st.file_uploader("Upload je transactiebestand (CSV)", type="csv")
@@ -84,7 +84,7 @@ if uploaded_file:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Portfolioverdeling (interactief)")
+        st.subheader("Portfolioverdeling")
         plot_data = portfolio.dropna(subset=['Current_Value'])
         plot_data = plot_data[plot_data['Current_Value'] > 0]
 
