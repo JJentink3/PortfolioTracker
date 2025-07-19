@@ -45,7 +45,7 @@ if uploaded_file:
     # Yahoo Finance ticker mapping
     ticker_mapping = {
         "ASML HOLDING": "ASML.AS",
-        "VANGUARD S&P500": "VUSA.L",
+        "VANGUARD S&P500": "VUSA.AS",
         "VANGUARD FTSE AW": "VWRL.AS",
         "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF": "WTAI.MI",
         "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF USD": "WTAI.MI",
