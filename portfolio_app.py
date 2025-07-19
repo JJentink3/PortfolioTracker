@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 
 st.set_page_config(page_title="Mijn Portfolio Tracker", layout="wide")
-st.title("\ud83d\udcc8 Mijn Portfolio Tracker")
+st.title("📈 Mijn Portfolio Tracker")
+
 
 # Upload CSV-bestand
 uploaded_file = st.file_uploader("Upload je transactiebestand (CSV)", type="csv")
@@ -118,7 +119,8 @@ if uploaded_file:
     st.metric("Ontvangen Dividend", f"€ {dividend_total:,.2f}")
 
     # Geschat ontvangen dividend op basis van historische dividenden
-    st.subheader("\ud83d\udcec Geschat Ontvangen Dividend")
+    st.subheader("📬 Geschat Ontvangen Dividend")
+
     estimated_total_dividend = 0.0
 
     df_sorted = df.sort_values("Date")
@@ -151,4 +153,5 @@ if uploaded_file:
     st.metric("Geschat Ontvangen Dividend", f"€ {estimated_total_dividend:,.2f}")
 
 else:
-    st.info("\ud83d\udcc1 Upload een CSV-bestand om te beginnen.")
+    st.info("📁 Upload een CSV-bestand om te beginnen.")
+
