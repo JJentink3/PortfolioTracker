@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 
 st.set_page_config(page_title="Mijn Portfolio Tracker", layout="wide")
-st.title("📈 Mijn Portfolio Tracker")
+st.title("\ud83d\udcc8 Mijn Portfolio Tracker")
 
 # Upload CSV-bestand
 uploaded_file = st.file_uploader("Upload je transactiebestand (CSV)", type="csv")
@@ -118,7 +118,7 @@ if uploaded_file:
     st.metric("Ontvangen Dividend", f"€ {dividend_total:,.2f}")
 
     # Geschat ontvangen dividend op basis van historische dividenden
-    st.subheader("📬 Geschat Ontvangen Dividend")
+    st.subheader("\ud83d\udcec Geschat Ontvangen Dividend")
     estimated_total_dividend = 0.0
 
     df_sorted = df.sort_values("Date")
@@ -131,17 +131,18 @@ if uploaded_file:
             if dividends.empty:
                 continue
 
-            transactions = df_sorted[df_sorted['Product'] == row['Product']]
-            cumulative_shares = 0
-            div_earned = 0.0
+            transactions = df_sorted[df_sorted['Product'] == row['Product']][['Date', 'Quantity']].copy()
+            transactions['Cumulative_Shares'] = transactions['Quantity'].cumsum()
 
-            for date, dividend_per_share in dividends.items():
-                date = pd.to_datetime(date)  # ⬅️ Zorg dat dividenddatum vergelijkbaar is met transactiedatum
-                cumulative_shares = transactions[transactions['Date'] <= date]['Quantity'].sum()
-                div_earned += cumulative_shares * dividend_per_share
+            div_earned = 0.0
+            for div_date, dividend_per_share in dividends.items():
+                div_date = pd.to_datetime(div_date)
+                relevant_tx = transactions[transactions['Date'] <= div_date]
+                if not relevant_tx.empty:
+                    shares_on_date = relevant_tx.iloc[-1]['Cumulative_Shares']
+                    div_earned += shares_on_date * dividend_per_share
 
             estimated_total_dividend += div_earned
-
 
         except:
             continue
@@ -149,5 +150,4 @@ if uploaded_file:
     st.metric("Geschat Ontvangen Dividend", f"€ {estimated_total_dividend:,.2f}")
 
 else:
-    st.info("📁 Upload een CSV-bestand om te beginnen.")
-
+    st.info("\ud83d\udcc1 Upload een CSV-bestand om te beginnen.")
