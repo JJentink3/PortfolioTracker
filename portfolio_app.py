@@ -136,12 +136,12 @@ if uploaded_file:
             div_earned = 0.0
 
             for date, dividend_per_share in dividends.items():
-                if date < df_sorted['Date'].min():
-                    continue
+                date = pd.to_datetime(date)  # ⬅️ Zorg dat dividenddatum vergelijkbaar is met transactiedatum
                 cumulative_shares = transactions[transactions['Date'] <= date]['Quantity'].sum()
                 div_earned += cumulative_shares * dividend_per_share
 
             estimated_total_dividend += div_earned
+
 
         except:
             continue
