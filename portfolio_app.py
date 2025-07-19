@@ -117,5 +117,23 @@ if uploaded_file:
     st.metric("Totaal Ongerealiseerde Winst", f"€ {winst:,.2f}")
     st.metric("Ontvangen Dividend", f"€ {dividend_total:,.2f}")
 
+    # Geschat ontvangen dividend op basis van historische dividenden
+    st.subheader("📬 Geschat Ontvangen Dividend")
+    estimated_total_dividend = 0.0
+
+    for _, row in portfolio.iterrows():
+        ticker = row['Ticker']
+        shares = row['Total_Shares']
+        try:
+            ticker_obj = yf.Ticker(ticker)
+            dividends = ticker_obj.dividends
+            if not dividends.empty:
+                total_div = dividends[dividends.index >= df['Date'].min()].sum() * shares
+                estimated_total_dividend += total_div
+        except:
+            continue
+
+    st.metric("Geschat Ontvangen Dividend", f"€ {estimated_total_dividend:,.2f}")
+
 else:
     st.info("📁 Upload een CSV-bestand om te beginnen.")
