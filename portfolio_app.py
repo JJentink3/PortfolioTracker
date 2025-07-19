@@ -121,15 +121,28 @@ if uploaded_file:
     st.subheader("📬 Geschat Ontvangen Dividend")
     estimated_total_dividend = 0.0
 
+    df_sorted = df.sort_values("Date")
+
     for _, row in portfolio.iterrows():
         ticker = row['Ticker']
-        shares = row['Total_Shares']
         try:
             ticker_obj = yf.Ticker(ticker)
             dividends = ticker_obj.dividends
-            if not dividends.empty:
-                total_div = dividends[dividends.index >= df['Date'].min()].sum() * shares
-                estimated_total_dividend += total_div
+            if dividends.empty:
+                continue
+
+            transactions = df_sorted[df_sorted['Product'] == row['Product']]
+            cumulative_shares = 0
+            div_earned = 0.0
+
+            for date, dividend_per_share in dividends.items():
+                if date < df_sorted['Date'].min():
+                    continue
+                cumulative_shares = transactions[transactions['Date'] <= date]['Quantity'].sum()
+                div_earned += cumulative_shares * dividend_per_share
+
+            estimated_total_dividend += div_earned
+
         except:
             continue
 
@@ -137,3 +150,4 @@ if uploaded_file:
 
 else:
     st.info("📁 Upload een CSV-bestand om te beginnen.")
+
