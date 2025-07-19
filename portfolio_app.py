@@ -47,8 +47,6 @@ if uploaded_file:
         "ASML HOLDING": "ASML.AS",
         "VANGUARD S&P500": "VUSA.AS",
         "VANGUARD FTSE AW": "VWRL.AS",
-        "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF": "WTAI.MI",
-        "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF USD": "WTAI.MI",
     }
     portfolio['Ticker'] = portfolio['Product'].map(ticker_mapping)
 
@@ -79,13 +77,13 @@ if uploaded_file:
     st.subheader("Overzicht")
     st.dataframe(portfolio, use_container_width=True)
 
-    # Waardeverdeling
+    # Waardeverdeling (kleinere taartdiagram)
     st.subheader("Portfolioverdeling")
     plot_data = portfolio.dropna(subset=['Current_Value'])
     plot_data = plot_data[plot_data['Current_Value'] > 0]
 
     if not plot_data.empty:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(4, 4))
         ax.pie(plot_data['Current_Value'], labels=plot_data['Product'], autopct='%1.1f%%')
         st.pyplot(fig)
     else:
@@ -96,5 +94,19 @@ if uploaded_file:
     winst = portfolio['Unrealized_Gain_€'].sum()
     st.metric("Totale Waarde", f"€ {totaal:,.2f}")
     st.metric("Totaal Ongerealiseerde Winst", f"€ {winst:,.2f}")
+
+    # Portfoliowaarde in de tijd (cumulatief)
+    st.subheader("Waardeontwikkeling over tijd")
+    df_filtered = df[df['Quantity'] > 0].copy()
+    df_filtered['Total_Value'] = df_filtered['Price'] * df_filtered['Quantity']
+    daily_value = df_filtered.groupby('Date')['Total_Value'].sum().cumsum().reset_index()
+
+    fig2, ax2 = plt.subplots()
+    ax2.plot(daily_value['Date'], daily_value['Total_Value'], marker='o')
+    ax2.set_title("Totale waarde van aankopen over tijd")
+    ax2.set_xlabel("Datum")
+    ax2.set_ylabel("Waarde in €")
+    st.pyplot(fig2)
+
 else:
     st.info("📁 Upload een CSV-bestand om te beginnen.")
