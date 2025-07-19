@@ -132,6 +132,7 @@ if uploaded_file:
                 continue
 
             transactions = df_sorted[df_sorted['Product'] == row['Product']][['Date', 'Quantity']].copy()
+            transactions['Quantity'] = pd.to_numeric(transactions['Quantity'], errors='coerce')
             transactions['Cumulative_Shares'] = transactions['Quantity'].cumsum()
 
             div_earned = 0.0
