@@ -52,6 +52,9 @@ if uploaded_file:
     }
     portfolio['Ticker'] = portfolio['Product'].map(ticker_mapping)
 
+    # Verwijder posities met 0 of negatieve aandelen
+    portfolio = portfolio[portfolio['Total_Shares'] > 0]
+
     # Live koersen ophalen
     def get_price(ticker):
         try:
@@ -78,9 +81,15 @@ if uploaded_file:
 
     # Waardeverdeling
     st.subheader("Portfolioverdeling")
-    fig, ax = plt.subplots()
-    ax.pie(portfolio['Current_Value'], labels=portfolio['Product'], autopct='%1.1f%%')
-    st.pyplot(fig)
+    plot_data = portfolio.dropna(subset=['Current_Value'])
+    plot_data = plot_data[plot_data['Current_Value'] > 0]
+
+    if not plot_data.empty:
+        fig, ax = plt.subplots()
+        ax.pie(plot_data['Current_Value'], labels=plot_data['Product'], autopct='%1.1f%%')
+        st.pyplot(fig)
+    else:
+        st.warning("Geen geldige posities om weer te geven in de grafiek.")
 
     # Totale waarde
     totaal = portfolio['Current_Value'].sum()
