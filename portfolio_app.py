@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import matplotlib.pyplot as plt
+import plotly.express as px
 
-st.set_page_config(page_title="My Portfolio Tracker", layout="wide")
-st.title("📈 My Portfolio Tracker")
+st.set_page_config(page_title="Mijn Portfolio Tracker", layout="wide")
+st.title("📈 Mijn Portfolio Tracker")
 
 # Upload CSV-bestand
 uploaded_file = st.file_uploader("Upload je transactiebestand (CSV)", type="csv")
@@ -46,6 +47,9 @@ if uploaded_file:
     ticker_mapping = {
         "ASML HOLDING": "ASML.AS",
         "VANGUARD S&P500": "VUSA.AS",
+        "VANGUARD FTSE AW": "VWRL.AS",
+        "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF": "WTAI.MI",
+        "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF USD": "WTAI.MI",
     }
     portfolio['Ticker'] = portfolio['Product'].map(ticker_mapping)
 
@@ -97,12 +101,9 @@ if uploaded_file:
         df_filtered['Total_Value'] = df_filtered['Price'] * df_filtered['Quantity']
         daily_value = df_filtered.groupby('Date')['Total_Value'].sum().cumsum().reset_index()
 
-        fig2, ax2 = plt.subplots()
-        ax2.plot(daily_value['Date'], daily_value['Total_Value'], marker='o')
-        ax2.set_title("Totale waarde van aankopen over tijd")
-        ax2.set_xlabel("Datum")
-        ax2.set_ylabel("Waarde in €")
-        st.pyplot(fig2)
+        fig2 = px.line(daily_value, x='Date', y='Total_Value', title="Totale waarde van aankopen over tijd")
+        fig2.update_layout(xaxis_title="Datum", yaxis_title="Waarde in €")
+        st.plotly_chart(fig2, use_container_width=True)
 
     # Totale waarde
     totaal = portfolio['Current_Value'].sum()
