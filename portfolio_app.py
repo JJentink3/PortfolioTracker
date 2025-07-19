@@ -46,7 +46,6 @@ if uploaded_file:
     ticker_mapping = {
         "ASML HOLDING": "ASML.AS",
         "VANGUARD S&P500": "VUSA.AS",
-        "VANGUARD FTSE AW": "VWRL.AS",
     }
     portfolio['Ticker'] = portfolio['Product'].map(ticker_mapping)
 
@@ -77,36 +76,39 @@ if uploaded_file:
     st.subheader("Overzicht")
     st.dataframe(portfolio, use_container_width=True)
 
-    # Waardeverdeling (kleinere taartdiagram)
-    st.subheader("Portfolioverdeling")
-    plot_data = portfolio.dropna(subset=['Current_Value'])
-    plot_data = plot_data[plot_data['Current_Value'] > 0]
+    # Visualisaties naast elkaar
+    col1, col2 = st.columns(2)
 
-    if not plot_data.empty:
-        fig, ax = plt.subplots(figsize=(4, 4))
-        ax.pie(plot_data['Current_Value'], labels=plot_data['Product'], autopct='%1.1f%%')
-        st.pyplot(fig)
-    else:
-        st.warning("Geen geldige posities om weer te geven in de grafiek.")
+    with col1:
+        st.subheader("Portfolioverdeling")
+        plot_data = portfolio.dropna(subset=['Current_Value'])
+        plot_data = plot_data[plot_data['Current_Value'] > 0]
+
+        if not plot_data.empty:
+            fig, ax = plt.subplots(figsize=(4, 4))
+            ax.pie(plot_data['Current_Value'], labels=plot_data['Product'], autopct='%1.1f%%')
+            st.pyplot(fig)
+        else:
+            st.warning("Geen geldige posities om weer te geven in de grafiek.")
+
+    with col2:
+        st.subheader("Waardeontwikkeling over tijd")
+        df_filtered = df[df['Quantity'] > 0].copy()
+        df_filtered['Total_Value'] = df_filtered['Price'] * df_filtered['Quantity']
+        daily_value = df_filtered.groupby('Date')['Total_Value'].sum().cumsum().reset_index()
+
+        fig2, ax2 = plt.subplots()
+        ax2.plot(daily_value['Date'], daily_value['Total_Value'], marker='o')
+        ax2.set_title("Totale waarde van aankopen over tijd")
+        ax2.set_xlabel("Datum")
+        ax2.set_ylabel("Waarde in €")
+        st.pyplot(fig2)
 
     # Totale waarde
     totaal = portfolio['Current_Value'].sum()
     winst = portfolio['Unrealized_Gain_€'].sum()
     st.metric("Totale Waarde", f"€ {totaal:,.2f}")
     st.metric("Totaal Ongerealiseerde Winst", f"€ {winst:,.2f}")
-
-    # Portfoliowaarde in de tijd (cumulatief)
-    st.subheader("Waardeontwikkeling over tijd")
-    df_filtered = df[df['Quantity'] > 0].copy()
-    df_filtered['Total_Value'] = df_filtered['Price'] * df_filtered['Quantity']
-    daily_value = df_filtered.groupby('Date')['Total_Value'].sum().cumsum().reset_index()
-
-    fig2, ax2 = plt.subplots()
-    ax2.plot(daily_value['Date'], daily_value['Total_Value'], marker='o')
-    ax2.set_title("Totale waarde van aankopen over tijd")
-    ax2.set_xlabel("Datum")
-    ax2.set_ylabel("Waarde in €")
-    st.pyplot(fig2)
 
 else:
     st.info("📁 Upload een CSV-bestand om te beginnen.")
