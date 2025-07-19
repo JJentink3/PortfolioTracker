@@ -4,8 +4,8 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-st.set_page_config(page_title="MY Portfolio Tracker", layout="wide")
-st.title("📈 My Portfolio Tracker")
+st.set_page_config(page_title="Mijn Portfolio Tracker", layout="wide")
+st.title("📈 Mijn Portfolio Tracker")
 
 # Upload CSV-bestand
 uploaded_file = st.file_uploader("Upload je transactiebestand (CSV)", type="csv")
@@ -31,6 +31,11 @@ if uploaded_file:
     numeric_cols = ['Quantity', 'Price', 'Local_Value', 'Fees', 'Total']
     for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # Dividendoverzicht
+    dividend_df = df[df['Total'] < 0]
+    dividend_df = dividend_df[dividend_df['Quantity'] == 0]  # Alleen geld ontvangen, geen aandelen gekocht
+    dividend_total = dividend_df['Total'].sum() * -1  # Positieve waarde tonen
 
     # Portfolio posities berekenen
     portfolio = df.groupby(['Product', 'ISIN']).agg(
@@ -105,11 +110,12 @@ if uploaded_file:
         fig2.update_layout(xaxis_title="Datum", yaxis_title="Waarde in €")
         st.plotly_chart(fig2, use_container_width=True)
 
-    # Totale waarde
+    # Totale waarde en dividend
     totaal = portfolio['Current_Value'].sum()
     winst = portfolio['Unrealized_Gain_€'].sum()
     st.metric("Totale Waarde", f"€ {totaal:,.2f}")
     st.metric("Totaal Ongerealiseerde Winst", f"€ {winst:,.2f}")
+    st.metric("Ontvangen Dividend", f"€ {dividend_total:,.2f}")
 
 else:
     st.info("📁 Upload een CSV-bestand om te beginnen.")
