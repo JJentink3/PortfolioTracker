@@ -84,14 +84,14 @@ if uploaded_file:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Portfolioverdeling")
+        st.subheader("Portfolioverdeling (interactief)")
         plot_data = portfolio.dropna(subset=['Current_Value'])
         plot_data = plot_data[plot_data['Current_Value'] > 0]
 
         if not plot_data.empty:
-            fig, ax = plt.subplots(figsize=(4, 4))
-            ax.pie(plot_data['Current_Value'], labels=plot_data['Product'], autopct='%1.1f%%')
-            st.pyplot(fig)
+            fig1 = px.pie(plot_data, values='Current_Value', names='Product', title='Portfolioverdeling')
+            fig1.update_traces(textinfo='percent+label')
+            st.plotly_chart(fig1, use_container_width=True)
         else:
             st.warning("Geen geldige posities om weer te geven in de grafiek.")
 
