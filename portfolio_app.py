@@ -4,12 +4,16 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-st.set_page_config(page_title="Mijn Portfolio Tracker", layout="wide")
-st.title("📈 Mijn Portfolio Tracker")
+st.set_page_config(page_title="My Portfolio Tracker", layout="wide")
+st.title("📈 My Portfolio Tracker")
+
+st.markdown("""
+This app gives insight into my long term investing portfolio.
+""")
 
 
 # Upload CSV-bestand
-uploaded_file = st.file_uploader("Upload je transactiebestand (CSV)", type="csv")
+uploaded_file = st.file_uploader("Upload your DEGIRO transactions file (CSV)", type="csv")
 
 if uploaded_file:
     df = pd.read_csv(uploaded_file)
@@ -53,9 +57,6 @@ if uploaded_file:
     ticker_mapping = {
         "ASML HOLDING": "ASML.AS",
         "VANGUARD S&P500": "VUSA.AS",
-        "VANGUARD FTSE AW": "VWRL.AS",
-        "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF": "WTAI.MI",
-        "WISDOMTREE ARTIFICIAL INTELLIGENCE UCITS ETF USD": "WTAI.MI",
     }
     portfolio['Ticker'] = portfolio['Product'].map(ticker_mapping)
 
